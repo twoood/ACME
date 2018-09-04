@@ -1,0 +1,50 @@
+<html>
+<head>
+<script language="Javascript" type="text/javascript">
+function ajax_post(){
+	var req = XMLHttpRequest();
+	var url = "acme_server.php";
+	var sr = document.getElementById("Rabbits").value;
+	var lb = document.getElementById("LBaskets").value;
+	var sb = document.getElementById("SBaskets").value;
+	var eg = document.getElementById("Eggs").value;
+	var order = "Rabbits="+sr+"&LBaskets="+lb+"&SBaskets"+sb+"&Eggs="+eg;
+	req.open("POST", url, true);
+	req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	req.onreadystatechange = function(){
+		if(req.readyState ==4 && req.status == 200) {
+			var return_data = req.reponseText;
+			document.getElementById("status").innerHTML = return_data;
+		}
+	req.send(order);
+	document.getElementById("status").innerHTML - "processing...";
+	}
+}
+</script>
+</head>
+<body>
+
+<h2 id="ACME"> ACME Website </h2>
+<p> This is the rough website </p>
+<p id="A_Order"> Please select the quantity of each item you desire: </p>
+
+<form action = "acme_server.php"
+	<p> Quantity of Stuffed Rabbits: <input type="text" name="Rabbits" />
+	<p> Quantity of Large Easter Baskets: <input type="text" name="LBaskets" />
+	<p> Quantity of Small Easter Baskets: <input type="text" name="SBaskets" />
+	<p> Quantity of Easter Eggs: <input type="text" name="Eggs" />
+<br> Select which items you'd like to group: </br>
+	<input type="checkbox" name="Group1" value="GRabbits"> Rabbits<br>
+	<input type="checkbox" name="Group2" value="GLBaskets"> Large Easter Baskets<br>
+	<input type="checkbox" name="Group3" value="GSBaskets"> Small Easter Baskets<br>
+	<input type="checkbox" name="Group4" value="GEggs"> Easter Eggs
+<br>
+<input name="myButton" type="submit" value="Submit Request" onClick="javascript:ajax_post();"</br>
+</form>
+<div id="status"></div>
+</body>
+</html>
+	
+	
+	
+	
