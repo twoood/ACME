@@ -7,8 +7,8 @@ function ajax_post(form) {
 	req = new XMLHttpRequest();
 	var text = {"Rabbits": form.Rabbits.value, "LBaskets": form.LBaskets.value, "SBaskets": form.SBaskets.value, "Eggs": form.Eggs.value};
 	var obj = JSON.stringify(text);
-	var group = '{"Rabbits": "form.Group1.value", "LBaskets": "form.Group2.value", "SBaskets": "form.Group3.value", "Eggs": "form.Group4.value"}';
-	// var ord = JSON.stringify(group);
+	var group = {"Rabbits": form.Group0.checked, "LBaskets": form.Group1.checked, "SBaskets": form.Group2.checked, "Eggs": form.Group3.checked};
+	var ord = JSON.stringify(group);
 	//var e = form.Eggs.value;
 	//var eg = e.toString();
 	//var url = "acme_server.php?Eggs=";
@@ -18,9 +18,9 @@ function ajax_post(form) {
 		if(req.readyState == 4 && req.status == 200) 
 			my_callback();
 	};
-	req.open("GET", "acme_server.php?order=" + obj, true);
+	req.open("GET", "acme_server.php?order=" + obj + "&group=" + ord, true);
 	req.send(null);	
-	// + "&group=" + ord
+
 }
 
 function my_callback() {
@@ -46,12 +46,12 @@ function my_callback() {
 	<p> Quantity of Large Easter Baskets: <input type="text" name="LBaskets" /></p>
 	<p> Quantity of Small Easter Baskets: <input type="text" name="SBaskets" /></p>
 	<p> Quantity of Easter Eggs: <input name="Eggs" type="text"  /></p>
-	<b> Select which items you'd like to group: </b><b>
-	<input type="checkbox" name="Group1" value="GRabbits"> Rabbits</b><b>
-	<input type="checkbox" name="Group2" value="GLBaskets"> Large Easter Baskets</b><b>
-	<input type="checkbox" name="Group3" value="GSBaskets"> Small Easter Baskets</b><b>
-	<input type="checkbox" name="Group4" value="GEggs"> Easter Eggs</b><br>
-	<button type ="button" onclick="ajax_post(this.form)">Submit Order</button>
+	<b> Select which items you'd like to group: </b><b><br>
+	<input type="checkbox" id="Group0"/> Rabbits</b><br>
+	<input type="checkbox" id="Group1"/> Large Easter Baskets<br>
+	<input type="checkbox" id="Group2"/> Small Easter Baskets<br>
+	<input type="checkbox" id="Group3"/> Easter Eggs<br>
+	<button type ="button" onclick="ajax_post(this.form)">Submit Order</button><br>
 </form>
 
 <p><span id="thispart"></span></p>
