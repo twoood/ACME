@@ -6,30 +6,41 @@
 function ajax_post(form) {
 	req = new XMLHttpRequest();
 	var text = {"Rabbits": form.Rabbits.value, "LBaskets": form.LBaskets.value, "SBaskets": form.SBaskets.value, "Eggs": form.Eggs.value};
-	var obj = JSON.stringify(text);
+	var shipping ={"Days": form.Days.value, "Minutes": form.Minutes.value};
 	var group = {"Rabbits": form.Group0.checked, "LBaskets": form.Group1.checked, "SBaskets": form.Group2.checked, "Eggs": form.Group3.checked};
+	var obj = JSON.stringify(text);
+	var ship = JSON.stringify(shipping);
 	var ord = JSON.stringify(group);
-	//var e = form.Eggs.value;
-	//var eg = e.toString();
-	//var url = "acme_server.php?Eggs=";
 	
+
+  document.getElementById("requested_time").innerHTML = "Your requested delivery time is " + shipping['Days'] + "day(s) and " + shipping['Minutes'] + " minute(s).";
+
 	req.onreadystatechange = function () 
 	{
+    if(req.readyState == 5)
+			document.getElementById("status").innerHTML = "CANNOT PROESS ORDER"
+		if(req.readyState == 2)
+			document.getElementById("status").innerHTML = "Order Processing"
 		if(req.readyState == 4 && req.status == 200) 
 			my_callback();
 	};
-	req.open("GET", "acme_server.php?order=" + obj + "&group=" + ord, true);
+	req.open("GET", "acme_server.php?order=" + obj + "&group=" + ord + "&shipp=" + ship, true);
 	req.send(null);	
 
 }
 
 function my_callback() {
     
-     
-	document.getElementById("thispart").innerHTML = req.responseText;
-	document.getElementById("thispart").style.font = "italic bold 20px arial,serif";
+    // var returned_string = String();
+
+	  document.getElementById("thispart").innerHTML = req.responseText;
+	  
        
-    alert("Order received from the server:\n"+req.responseText);
+    //alert("Order received from the server:\n"+req.responseText);
+	  document.getElementById("status").innerHTML = req.responseText;
+	  //document.getElementById("thispart").style.font = "bold 20px arial,serif";
+       
+    alert("Order received from the server!");
 }
 
 
@@ -38,22 +49,40 @@ function my_callback() {
 <body>
 
 <h2 id="ACME"> ACME Website </h2>
+
 <p> This is the rough website </p>
-<p id="A_Order"> Please select the quantity of each item you desire: </p>
+
+<p id="A_Order"> Please select the quantity of each item you wish to order: </p>
 
 <form action = "acme_server.php">
-	<p> Quantity of Stuffed Rabbits: <input type="text" name="Rabbits" /></p>
-	<p> Quantity of Large Easter Baskets: <input type="text" name="LBaskets" /></p>
-	<p> Quantity of Small Easter Baskets: <input type="text" name="SBaskets" /></p>
-	<p> Quantity of Easter Eggs: <input name="Eggs" type="text"  /></p>
-	<b> Select which items you'd like to group: </b><b><br>
-	<input type="checkbox" id="Group0"/> Rabbits</b><br>
+	<p> Quantity of Stuffed Rabbits: <input type="text" name="Rabbits"/></p>
+	<p> Quantity of Large Easter Baskets: <input type="text" name="LBaskets"/></p>
+	<p> Quantity of Small Easter Baskets: <input type="text" name="SBaskets"/></p>
+	<p> Quantity of Easter Eggs: <input name="Eggs" type="text"/></p>
+	<b> Select which items you'd like to group: </b><br>
+	<input type="checkbox" id="Group0"/> Rabbits<br>
 	<input type="checkbox" id="Group1"/> Large Easter Baskets<br>
 	<input type="checkbox" id="Group2"/> Small Easter Baskets<br>
 	<input type="checkbox" id="Group3"/> Easter Eggs<br>
+
+	<p> Requested Delivery Date (Days): <input type="text" name="Days"/></p><br>
+	<p><b> Delivery Dates: </b></p>
+	<p> Requested Delivery Date (Days): <input type="text" name="Days"/></p>
+	<p> Requested Delivery Date (Minutes): <input type="text" name="Minutes"/></p><br>
 	<button type ="button" onclick="ajax_post(this.form)">Submit Order</button><br>
 </form>
 
-<p><span id="thispart"></span></p>
+
+<p><div id="thispart"></div></p>
+<div id="orders">
+	<p id="requested_time"></p>
+	<!-- update average delivery times depending on server -->
+	<p id="avg_times"><b> Average delivery times: 1 day, 5 minutes </b></p>
+	<p id="status"></p>
+	<!-- put which items belong in each part of order -->
+	<p id="litte_order"></p> 
+	<p id="big_order"></p>
+	<p id="grouped_items"></p>
+</div>
 </body>
 </html>
