@@ -12,11 +12,12 @@ function ajax_post(form) {
 	var ship = JSON.stringify(shipping);
 	var ord = JSON.stringify(group);
 	
-	document.getElementById("requested_time").innerHTML = "Your requested delivery time is " + shipping['Days'] + "day(s) and " + shipping['Minutes'] + " minute(s).";
+
+  document.getElementById("requested_time").innerHTML = "Your requested delivery time is " + shipping['Days'] + "day(s) and " + shipping['Minutes'] + " minute(s).";
 
 	req.onreadystatechange = function () 
 	{
-		if(req.readyState == 5)
+    if(req.readyState == 5)
 			document.getElementById("status").innerHTML = "CANNOT PROESS ORDER"
 		if(req.readyState == 2)
 			document.getElementById("status").innerHTML = "Order Processing"
@@ -31,8 +32,13 @@ function ajax_post(form) {
 function my_callback() {
     
     // var returned_string = String();
-	document.getElementById("status").innerHTML = req.responseText;
-	//document.getElementById("thispart").style.font = "bold 20px arial,serif";
+
+	  document.getElementById("thispart").innerHTML = req.responseText;
+	  
+       
+    //alert("Order received from the server:\n"+req.responseText);
+	  document.getElementById("status").innerHTML = req.responseText;
+	  //document.getElementById("thispart").style.font = "bold 20px arial,serif";
        
     alert("Order received from the server!");
 }
@@ -43,6 +49,9 @@ function my_callback() {
 <body>
 
 <h2 id="ACME"> ACME Website </h2>
+
+<p> This is the rough website </p>
+
 <p id="A_Order"> Please select the quantity of each item you wish to order: </p>
 
 <form action = "acme_server.php">
@@ -55,12 +64,16 @@ function my_callback() {
 	<input type="checkbox" id="Group1"/> Large Easter Baskets<br>
 	<input type="checkbox" id="Group2"/> Small Easter Baskets<br>
 	<input type="checkbox" id="Group3"/> Easter Eggs<br>
+
+	<p> Requested Delivery Date (Days): <input type="text" name="Days"/></p><br>
 	<p><b> Delivery Dates: </b></p>
 	<p> Requested Delivery Date (Days): <input type="text" name="Days"/></p>
 	<p> Requested Delivery Date (Minutes): <input type="text" name="Minutes"/></p><br>
 	<button type ="button" onclick="ajax_post(this.form)">Submit Order</button><br>
 </form>
 
+
+<p><div id="thispart"></div></p>
 <div id="orders">
 	<p id="requested_time"></p>
 	<!-- update average delivery times depending on server -->

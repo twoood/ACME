@@ -1,4 +1,5 @@
 <?php
+
 	session_start();   // allows us to keep track of average delivery times between refreshes
 	$_SESSION["avg_days"] = 1;
 	$_SESSION["avg_minutes"] = 10;
@@ -10,12 +11,15 @@
 	$order = html_entity_decode($h_order);
 	$group = html_entity_decode($h_group);
 	$d_ship = json_decode($ship, TRUE);
+
 	$req_mins = (int)$d_ship['Minutes'];
 	$req_days = (int)$d_ship['Days'];
+
 	$d_order = json_decode($order, TRUE);
 	$d_group = json_decode($group, TRUE);
 	$grouping = array("key");
 	
+
 	foreach ($d_group as &$value) {
 		if ($value != "1") {
 			$value = "0";
@@ -31,6 +35,7 @@
 	}
 	print "\n";
 	*/
+	
 	include 'big.php';
 	include 'little.php';
 
