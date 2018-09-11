@@ -31,14 +31,35 @@ function ajax_post(form) {
 
 function my_callback() {
     
-    // var returned_string = String();
+       var r_orders = req.responseText;
+       var json_order = JSON.parse(r_orders);
 
-	  document.getElementById("thispart").innerHTML = req.responseText;
-	  
-       
-    //alert("Order received from the server:\n"+req.responseText);
-	  document.getElementById("status").innerHTML = req.responseText;
-	  //document.getElementById("thispart").style.font = "bold 20px arial,serif";
+
+    	var little_o = "<b>LITTLEstuff products:</b><br>" +"Easter Eggs: " + json_order.e_quantity;
+    	var big_o = "<b>BIGstuff products:</b><br>" + "Large Easter Baskets: " + json_order.lb_quantity + "<br>Small Easter Baskets: " + json_order.sb_quantity;
+    	var acme_o = "<b>ACME products:</b><br>" + "Rabbits: " + json_order.r_quantity;
+    	var ship_o = json_order.ship_string;
+
+
+		document.getElementById("status").innerHTML = ship_o.bold();
+		document.getElementById("litte_order").innerHTML = little_o;
+		document.getElementById("big_order").innerHTML = big_o;
+		document.getElementById("acme").innerHTML = acme_o;
+
+		var g_items = "<b>Grouped Items:</b><br>";
+		if (json_order.r_grouped == "Grouped")
+			g_items = g_items + "Rabbits<br>";
+		if (json_order.lb_grouped == "Grouped")
+			g_items = g_items + "Large Easter Baskets<br>";
+		if (json_order.sb_grouped == "Grouped")
+			g_items = g_items + "Small Easter Baskets<br>";
+		if (json_order.e_grouped == "Grouped")
+			g_items = g_items + "Easter Eggs<br>";
+		if (g_items == "<b>Grouped Items:</b><br>")
+			g_items = "No Items are Grouped.<br>";
+
+		document.getElementById("grouped_items").innerHTML = g_items;
+
        
     alert("Order received from the server!");
 }
@@ -65,7 +86,6 @@ function my_callback() {
 	<input type="checkbox" id="Group2"/> Small Easter Baskets<br>
 	<input type="checkbox" id="Group3"/> Easter Eggs<br>
 
-	<p> Requested Delivery Date (Days): <input type="text" name="Days"/></p><br>
 	<p><b> Delivery Dates: </b></p>
 	<p> Requested Delivery Date (Days): <input type="text" name="Days"/></p>
 	<p> Requested Delivery Date (Minutes): <input type="text" name="Minutes"/></p><br>
@@ -73,7 +93,7 @@ function my_callback() {
 </form>
 
 
-<p><div id="thispart"></div></p>
+
 <div id="orders">
 	<p id="requested_time"></p>
 	<!-- update average delivery times depending on server -->
@@ -82,6 +102,7 @@ function my_callback() {
 	<!-- put which items belong in each part of order -->
 	<p id="litte_order"></p> 
 	<p id="big_order"></p>
+	<p id="acme"></p>
 	<p id="grouped_items"></p>
 </div>
 </body>
