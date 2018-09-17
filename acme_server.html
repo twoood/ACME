@@ -27,8 +27,10 @@ function acme(form) {
 	var ship = JSON.stringify(shipping);
 	var ord = JSON.stringify(group);
 
+	var times_met = (o_days >= a_days) && (o_mins >= a_mins);
+
 	//if can meet delivery times
-	if ((o_days >= a_days) && (o_mins >= a_mins)) {
+	if (times_met) {
 		//display request time
 		document.getElementById("requested_time").innerHTML = "Your requested delivery time is " + shipping['Days'] + " day(s) and " + shipping['Minutes'] + " minute(s).";
 
@@ -68,7 +70,7 @@ function acme(form) {
 			req_little.open("GET", "little.php", true); //asynchronous
 			req_little.send(null);
 		}
-		else {
+		else if (!text["Eggs"] && (text["LBaskets"] || text["SBaskets"])){
 			complete = true; //display when order is complete if little isn't used
 		}
 
@@ -77,7 +79,7 @@ function acme(form) {
 			req_big.send(null);
 		}
 
-		if (complete == true) {
+		if (complete == true && times_met) {
 			document.getElementById("status").innerHTML = document.getElementById("status").innerHTML + "\n <h1>ORDER IS COMPLETE!</h1>"
 
     		alert("ORDER IS NOW COMPLETE!")
