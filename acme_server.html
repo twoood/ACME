@@ -4,54 +4,126 @@
 <script>
 
 function acme(form) {
+	alert('ACME Received Your Order for Processing.')
+	req_acme = new XMLHttpRequest();
+	req_little = new XMLHttpRequest();
+	req_big = new XMLHttpRequest();
+
 	var text = {"Rabbits": form.Rabbits.value, "LBaskets": form.LBaskets.value, "SBaskets": form.SBaskets.value, "Eggs": form.Eggs.value};
-	var shipping ={"Days": form.Days.value, "Minutes": form.Minutes.value};
 	var group = {"Rabbits": form.Group0.checked, "LBaskets": form.Group1.checked, "SBaskets": form.Group2.checked, "Eggs": form.Group3.checked};
+	
+	//get times for order
+	var a_days = Math.floor((Math.random() * 7) + 1);
+	var a_mins = Math.floor((Math.random() * 59) + 1);
+
+	var shipping ={"Days": form.Days.value, "Minutes": form.Minutes.value, "ADays": a_days, "AMins": a_mins};
+
+	//get requested days and minutes
+	var o_days = parseInt(shipping["Days"]);
+	var o_mins = parseInt(shipping["Minutes"]);
+
+	//prepare variables for passing to php
 	var obj = JSON.stringify(text);
 	var ship = JSON.stringify(shipping);
 	var ord = JSON.stringify(group);
 
-	//display request time
-	document.getElementById("requested_time").innerHTML = "Your requested delivery time is " + shipping['Days'] + " day(s) and " + shipping['Minutes'] + " minute(s).";
+	//if can meet delivery times
+	if ((o_days >= a_days) && (o_mins >= a_mins)) {
+		//display request time
+		document.getElementById("requested_time").innerHTML = "Your requested delivery time is " + shipping['Days'] + " day(s) and " + shipping['Minutes'] + " minute(s).";
 
-	//display ordered items
-	//NEEDS TO BE WORKED ON
+		document.getElementById("status").innerHTML = "Your order will be delivered in " + a_days + " days and " + a_mins + " minutes."
+		req_acme.onreadystatechange = function () 
+		{
+			// if(req_acme.readyState == 2)
+			// 	document.getElementById("status").innerHTML = "Order Processing"
+			if(req_acme.readyState == 4 && req_acme.status == 200) 
+				acme_callback();
+		};
+		
+		//do AJAX request to Little Stuff
+		req_little.onreadystatechange = function (){
+			if(req_little.readyState == 4 && req_little.status == 200) 
+				little_callback();
+		}
+		
+		//do synchronous request to BigStuff
+		req_big.onreadystatechange = function (){
+			if(req_big.readyState == 4 && req_big.status == 200) 
+				big_callback();
+		}
 
-	//display average times
-	req_acme = new XMLHttpRequest();
-	req_acme.onreadystatechange = function () 
-	{
-		if(req_acme.readyState == 2)
-			document.getElementById("status").innerHTML = "Order Processing"
-		if(req_acme.readyState == 4 && req_acme.status == 200) 
-			acme_callback();
-	};
-	req_acme.open("GET", "acme_server.php?order=" + obj + "&group=" + ord + "&shipp=" + ship, true);
-	req_acme.send(null);	
+		//actual requests
+
+		//ACME Items - Stuffed bunny
+		//BigStuff Items - big and small easter baskets
+		//LittleStuff Items - toy eggs
+		req_acme.open("GET", "acme_server.php?order=" + obj + "&group=" + ord + "&shipp=" + ship, false);
+		req_acme.send(null);
 
 
-	//do AJAX request to Little Stuff
-	req_little = new XMLHttpRequest();
-	req_little.onreadystatechange = function (){
-		if(req_little.readyState == 4 && req_little.status == 200) 
-			little_callback();
+		var complete = false;
+
+		if (text["Eggs"]) {
+			req_little.open("GET", "little.php", true); //asynchronous
+			req_little.send(null);
+		}
+		else {
+			complete = true; //display when order is complete if little isn't used
+		}
+
+		if(text["LBaskets"] || text["SBaskets"]){
+			req_big.open("GET", "big.php", false); //synchronous
+			req_big.send(null);
+		}
+
+		if (complete == true) {
+			document.getElementById("status").innerHTML = document.getElementById("status").innerHTML + "\n <h1>ORDER IS COMPLETE!</h1>"
+
+    		alert("ORDER IS NOW COMPLETE!")
+		}
 	}
-	req_little.open("GET", "little.php", true);
-	req_little.send(null);
-
-	//do synchronous request to BigStuff
-	req_big = new XMLHttpRequest();
-	req_big.onreadystatechange = function (){
-		if(req_big.readyState == 4 && req_big.status == 200) 
-			big_callback();
+	else {
+		alert("I'm sorry, ACME determined that order unable to be met in specified time.");
+		document.getElementById("requested_time").innerHTML = "<h1>Your requested delivery time:" + shipping['Days'] + " day(s) and " + shipping['Minutes'] + " minute(s) was not able to be met.</h1>";
 	}
-	req_big.open("GET", "big.php", false); //synchronous
-	req_big.send(null);
 }
+
+//------------
+// callbacks
 
 //get average times from acme server
 function acme_callback() {
-	document.getElementById("avg_times").innerHTML = req.responseText;
+	//document.getElementById("avg_times").innerHTML = req.responseText;
+	var r_orders = req_acme.responseText;
+	var json_order = JSON.parse(r_orders);
+
+	var little_o = "<b>LITTLEstuff products:</b><br>" +"Easter Eggs: " + json_order.e_quantity;
+	var big_o = "<b>BIGstuff products:</b><br>" + "Large Easter Baskets: " + json_order.lb_quantity + "<br>Small Easter Baskets: " + json_order.sb_quantity;
+	var acme_o = "<b>ACME products:</b><br>" + "Rabbits: " + json_order.r_quantity;
+	var ship_o = json_order.ship_string;
+
+	document.getElementById("avg_times").innerHTML = ship_o.bold();
+	document.getElementById("litte_order").innerHTML = little_o;
+	document.getElementById("big_order").innerHTML = big_o;
+	document.getElementById("acme").innerHTML = acme_o;
+
+	var g_items = "<b>Grouped Items:</b><br>";
+	if (json_order.r_grouped == "Grouped")
+		g_items = g_items + "Rabbits<br>";
+	if (json_order.lb_grouped == "Grouped")
+		g_items = g_items + "Large Easter Baskets<br>";
+	if (json_order.sb_grouped == "Grouped")
+		g_items = g_items + "Small Easter Baskets<br>";
+	if (json_order.e_grouped == "Grouped")
+		g_items = g_items + "Easter Eggs<br>";
+	if (g_items == "<b>Grouped Items:</b><br>")
+		g_items = "No Items are Grouped.<br>";
+
+	document.getElementById("grouped_items").innerHTML = g_items;
+
+	   
+	//alert("Order received from the server!");
 }
 
 function little_callback() {
@@ -63,6 +135,10 @@ function little_callback() {
 	  //document.getElementById("thispart").style.font = "bold 20px arial,serif";
        
     alert("Order received from the LittleStuff!");
+
+    document.getElementById("status").innerHTML = document.getElementById("status").innerHTML + "\n <h1>ORDER IS COMPLETE!</h1>"
+
+    alert("ORDER IS NOW COMPLETE!")
 }
 
 function big_callback(){
@@ -100,13 +176,17 @@ function big_callback(){
 </form>
 
 <div id="orders">
+	<h3> Delivery Expectations </h3>
 	<p id="requested_time"></p>
 	<!-- update average delivery times depending on server -->
 	<p id="avg_times"><b> Average delivery times: 1 day, 5 minutes </b></p>
 	<p id="status"></p>
+
+	<h3> Order Details </h3>
 	<!-- put which items belong in each part of order -->
 	<p id="litte_order"></p> 
 	<p id="big_order"></p>
+	<p id="acme"></p>
 	<p id="grouped_items"></p>
 </div>
 </body>
