@@ -3,33 +3,58 @@
 <head>
 <script>
 
-function ajax_post(form) {
-	req = new XMLHttpRequest();
+function acme(form) {
 	var text = {"Rabbits": form.Rabbits.value, "LBaskets": form.LBaskets.value, "SBaskets": form.SBaskets.value, "Eggs": form.Eggs.value};
 	var shipping ={"Days": form.Days.value, "Minutes": form.Minutes.value};
 	var group = {"Rabbits": form.Group0.checked, "LBaskets": form.Group1.checked, "SBaskets": form.Group2.checked, "Eggs": form.Group3.checked};
 	var obj = JSON.stringify(text);
 	var ship = JSON.stringify(shipping);
 	var ord = JSON.stringify(group);
-	
 
-  document.getElementById("requested_time").innerHTML = "Your requested delivery time is " + shipping['Days'] + "day(s) and " + shipping['Minutes'] + " minute(s).";
+	//display request time
+	document.getElementById("requested_time").innerHTML = "Your requested delivery time is " + shipping['Days'] + " day(s) and " + shipping['Minutes'] + " minute(s).";
 
-	req.onreadystatechange = function () 
+	//display ordered items
+	//NEEDS TO BE WORKED ON
+
+	//display average times
+	req_acme = new XMLHttpRequest();
+	req_acme.onreadystatechange = function () 
 	{
-    if(req.readyState == 5)
-			document.getElementById("status").innerHTML = "CANNOT PROESS ORDER"
-		if(req.readyState == 2)
+		if(req_acme.readyState == 2)
 			document.getElementById("status").innerHTML = "Order Processing"
-		if(req.readyState == 4 && req.status == 200) 
-			my_callback();
+		if(req_acme.readyState == 4 && req_acme.status == 200) 
+			acme_callback();
 	};
-	req.open("GET", "acme_server.php?order=" + obj + "&group=" + ord + "&shipp=" + ship, true);
-	req.send(null);	
+	req_acme.open("GET", "acme_server.php?order=" + obj + "&group=" + ord + "&shipp=" + ship, true);
+	req_acme.send(null);	
 
+
+	//do AJAX request to Little Stuff
+	req_little = new XMLHttpRequest();
+	req_little.onreadystatechange = function (){
+		if(req_little.readyState == 4 && req_little.status == 200) 
+			little_callback();
+	}
+	req_little.open("GET", "little.php", true);
+	req_little.send(null);
+
+	//do synchronous request to BigStuff
+	req_big = new XMLHttpRequest();
+	req_big.onreadystatechange = function (){
+		if(req_big.readyState == 4 && req_big.status == 200) 
+			big_callback();
+	}
+	req_big.open("GET", "big.php", false); //synchronous
+	req_big.send(null);
 }
 
-function my_callback() {
+//get average times from acme server
+function acme_callback() {
+	document.getElementById("avg_times").innerHTML = req.responseText;
+}
+
+function little_callback() {
     
        var r_orders = req.responseText;
        var json_order = JSON.parse(r_orders);
@@ -61,9 +86,15 @@ function my_callback() {
 		document.getElementById("grouped_items").innerHTML = g_items;
 
        
-    alert("Order received from the server!");
+    alert("Order received from the LittleStuff!");
 }
 
+function big_callback(){
+	//document.getElementById("status").innerHTML = req.responseText;
+	  //document.getElementById("thispart").style.font = "bold 20px arial,serif";
+       
+    alert("Order received from the BigStuff!");
+}
 
 </script>
 </head>
@@ -89,10 +120,8 @@ function my_callback() {
 	<p><b> Delivery Dates: </b></p>
 	<p> Requested Delivery Date (Days): <input type="text" name="Days"/></p>
 	<p> Requested Delivery Date (Minutes): <input type="text" name="Minutes"/></p><br>
-	<button type ="button" onclick="ajax_post(this.form)">Submit Order</button><br>
+	<button type ="button" onclick="acme(this.form)">Submit Order</button><br>
 </form>
-
-
 
 <div id="orders">
 	<p id="requested_time"></p>

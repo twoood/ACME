@@ -6,4 +6,5 @@
 	function big_do_delay(){
 		sleep(rand(3,6));
 	}
+	big_do_delay();
 ?>

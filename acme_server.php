@@ -76,18 +76,16 @@
 	$a_minutes = big_get_delay();
 
 	//this part not working yet --- want to return if we cannot do delivery
-	if ($req_days > $a_days){
-		exit(5);
-	}
+	// if ($req_days > $a_days){
+	// 	exit(5);
+	// }
 
-	if (($req_days == $a_days) && ($req_mins > $a_minutes)) {
-		exit(5);
-	}
+	// if (($req_days == $a_days) && ($req_mins > $a_minutes)) {
+	// 	exit(5);
+	// }
 	
-	little_do_delay();
-	big_do_delay();
-
-
+	// little_do_delay();
+	// big_do_delay();
 	
 	// print "Rabbits :" . $d_order["Rabbits"] . "\t\t\t\t" . $grouping[1] . "\nLarge Easter Baskets :" . $d_order["LBaskets"] . "\t" . $grouping[2] . "\nSmall Easter Baskets :" . $d_order["SBaskets"] . "\t" . $grouping[3] . "\nEaster Eggs :" . $d_order["Eggs"] . "\t\t\t" . $grouping[4] . "\n";
 
