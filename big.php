@@ -1,6 +1,10 @@
 <?php
 //delay in minutes
 	function big_get_delay (){
-		return rand(1,7); // get delay minutes
+		return rand(1,60); // get delay minutes
 	}
+	function big_do_delay(){
+		sleep(rand(3,6));
+	}
+	big_do_delay();
 ?>

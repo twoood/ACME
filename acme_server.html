@@ -3,41 +3,107 @@
 <head>
 <script>
 
-function ajax_post(form) {
-	req = new XMLHttpRequest();
+function acme(form) {
 	var text = {"Rabbits": form.Rabbits.value, "LBaskets": form.LBaskets.value, "SBaskets": form.SBaskets.value, "Eggs": form.Eggs.value};
 	var shipping ={"Days": form.Days.value, "Minutes": form.Minutes.value};
 	var group = {"Rabbits": form.Group0.checked, "LBaskets": form.Group1.checked, "SBaskets": form.Group2.checked, "Eggs": form.Group3.checked};
 	var obj = JSON.stringify(text);
 	var ship = JSON.stringify(shipping);
 	var ord = JSON.stringify(group);
-	
-	req.onreadystatechange = function () 
+
+	//display request time
+	document.getElementById("requested_time").innerHTML = "Your requested delivery time is " + shipping['Days'] + " day(s) and " + shipping['Minutes'] + " minute(s).";
+
+	//display ordered items
+	//NEEDS TO BE WORKED ON
+
+	//display average times
+	req_acme = new XMLHttpRequest();
+	req_acme.onreadystatechange = function () 
 	{
-		if(req.readyState == 4 && req.status == 200) 
-			my_callback();
+		if(req_acme.readyState == 2)
+			document.getElementById("status").innerHTML = "Order Processing"
+		if(req_acme.readyState == 4 && req_acme.status == 200) 
+			acme_callback();
 	};
-	req.open("GET", "acme_server.php?order=" + obj + "&group=" + ord + "&shipp=" + ship, true);
-	req.send(null);	
+	req_acme.open("GET", "acme_server.php?order=" + obj + "&group=" + ord + "&shipp=" + ship, true);
+	req_acme.send(null);	
 
+
+	//do AJAX request to Little Stuff
+	req_little = new XMLHttpRequest();
+	req_little.onreadystatechange = function (){
+		if(req_little.readyState == 4 && req_little.status == 200) 
+			little_callback();
+	}
+	req_little.open("GET", "little.php", true);
+	req_little.send(null);
+
+	//do synchronous request to BigStuff
+	req_big = new XMLHttpRequest();
+	req_big.onreadystatechange = function (){
+		if(req_big.readyState == 4 && req_big.status == 200) 
+			big_callback();
+	}
+	req_big.open("GET", "big.php", false); //synchronous
+	req_big.send(null);
 }
 
-function my_callback() {
+//get average times from acme server
+function acme_callback() {
+	document.getElementById("avg_times").innerHTML = req.responseText;
+}
+
+function little_callback() {
     
-    // var returned_string = String();
-	document.getElementById("thispart").innerHTML = req.responseText;
-	//document.getElementById("thispart").style.font = "bold 20px arial,serif";
+       var r_orders = req.responseText;
+       var json_order = JSON.parse(r_orders);
+
+
+    	var little_o = "<b>LITTLEstuff products:</b><br>" +"Easter Eggs: " + json_order.e_quantity;
+    	var big_o = "<b>BIGstuff products:</b><br>" + "Large Easter Baskets: " + json_order.lb_quantity + "<br>Small Easter Baskets: " + json_order.sb_quantity;
+    	var acme_o = "<b>ACME products:</b><br>" + "Rabbits: " + json_order.r_quantity;
+    	var ship_o = json_order.ship_string;
+
+
+		document.getElementById("status").innerHTML = ship_o.bold();
+		document.getElementById("litte_order").innerHTML = little_o;
+		document.getElementById("big_order").innerHTML = big_o;
+		document.getElementById("acme").innerHTML = acme_o;
+
+		var g_items = "<b>Grouped Items:</b><br>";
+		if (json_order.r_grouped == "Grouped")
+			g_items = g_items + "Rabbits<br>";
+		if (json_order.lb_grouped == "Grouped")
+			g_items = g_items + "Large Easter Baskets<br>";
+		if (json_order.sb_grouped == "Grouped")
+			g_items = g_items + "Small Easter Baskets<br>";
+		if (json_order.e_grouped == "Grouped")
+			g_items = g_items + "Easter Eggs<br>";
+		if (g_items == "<b>Grouped Items:</b><br>")
+			g_items = "No Items are Grouped.<br>";
+
+		document.getElementById("grouped_items").innerHTML = g_items;
+
        
-    alert("Order received from the server:\n"+req.responseText);
+    alert("Order received from the LittleStuff!");
 }
 
+function big_callback(){
+	//document.getElementById("status").innerHTML = req.responseText;
+	  //document.getElementById("thispart").style.font = "bold 20px arial,serif";
+       
+    alert("Order received from the BigStuff!");
+}
 
 </script>
 </head>
 <body>
 
 <h2 id="ACME"> ACME Website </h2>
+
 <p> This is the rough website </p>
+
 <p id="A_Order"> Please select the quantity of each item you wish to order: </p>
 
 <form action = "acme_server.php">
@@ -50,11 +116,23 @@ function my_callback() {
 	<input type="checkbox" id="Group1"/> Large Easter Baskets<br>
 	<input type="checkbox" id="Group2"/> Small Easter Baskets<br>
 	<input type="checkbox" id="Group3"/> Easter Eggs<br>
-	<p> Requested Delivery Date (Days): <input type="text" name="Days"/></p><br>
+
+	<p><b> Delivery Dates: </b></p>
+	<p> Requested Delivery Date (Days): <input type="text" name="Days"/></p>
 	<p> Requested Delivery Date (Minutes): <input type="text" name="Minutes"/></p><br>
-	<button type ="button" onclick="ajax_post(this.form)">Submit Order</button><br>
+	<button type ="button" onclick="acme(this.form)">Submit Order</button><br>
 </form>
 
-<p><div id="thispart"></div></p>
+<div id="orders">
+	<p id="requested_time"></p>
+	<!-- update average delivery times depending on server -->
+	<p id="avg_times"><b> Average delivery times: 1 day, 5 minutes </b></p>
+	<p id="status"></p>
+	<!-- put which items belong in each part of order -->
+	<p id="litte_order"></p> 
+	<p id="big_order"></p>
+	<p id="acme"></p>
+	<p id="grouped_items"></p>
+</div>
 </body>
 </html>
