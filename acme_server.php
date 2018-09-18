@@ -75,8 +75,6 @@
 
 
 	$obj1->ship_string="Average delivery time: ". $_SESSION["avg_days"] ." days and ". $_SESSION["avg_minutes"] ."  minutes";
-	//print json_encode($obj1);
-
 	
 	print json_encode($obj1);
 ?>
