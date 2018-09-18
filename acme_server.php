@@ -40,7 +40,7 @@
 		}
 	}
 
-	// a bit class to encapsulate the whole order
+	// a big class to encapsulate the whole order
 	class Total_order {
 		public $r_quantity;
 		public $r_grouped;
