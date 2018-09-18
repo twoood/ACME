@@ -37,11 +37,9 @@ function acme(form) {
 		document.getElementById("status").innerHTML = "Your order will be delivered in " + a_days + " days and " + a_mins + " minutes."
 		req_acme.onreadystatechange = function () 
 		{
-			// if(req_acme.readyState == 2)
-			// 	document.getElementById("status").innerHTML = "Order Processing"
 			if(req_acme.readyState == 4 && req_acme.status == 200) 
 				acme_callback();
-		};
+		}
 		
 		//do AJAX request to Little Stuff
 		req_little.onreadystatechange = function (){
@@ -96,7 +94,6 @@ function acme(form) {
 
 //get average times from acme server
 function acme_callback() {
-	//document.getElementById("avg_times").innerHTML = req.responseText;
 	var r_orders = req_acme.responseText;
 	var json_order = JSON.parse(r_orders);
 
@@ -123,9 +120,6 @@ function acme_callback() {
 		g_items = "No Items are Grouped.<br>";
 
 	document.getElementById("grouped_items").innerHTML = g_items;
-
-	   
-	//alert("Order received from the server!");
 }
 
 function little_callback() {      
@@ -144,12 +138,12 @@ function big_callback(){
 </head>
 <body>
 
-<h2 id="ACME"> ACME Website </h2>
+<h2 id="ACME"> ACME  </h2>
 
-<p> This is the rough website </p>
+<p><b>Thank you for choosing ACME!</b> </p>
 
 <p id="A_Order"> Please select the quantity of each item you wish to order: </p>
-
+<!--Form that does all the user interaction-->
 <form action = "acme_server.php">
 	<p> Quantity of Stuffed Rabbits: <input type="text" name="Rabbits"/></p>
 	<p> Quantity of Large Easter Baskets: <input type="text" name="LBaskets"/></p>

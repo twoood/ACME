@@ -7,9 +7,11 @@
 		$_SESSION["avg_minutes"] = 5;
 	} 
 
-	$h_order = $_REQUEST["order"];
-	$h_group = $_REQUEST["group"];
-	$h_shipping = $_REQUEST["shipp"];
+	$h_order = $_REQUEST["order"];	//get order information
+	$h_group = $_REQUEST["group"];  //get grouping information
+	$h_shipping = $_REQUEST["shipp"];  //get shipping information
+
+	//decode all html entities
 	$ship = html_entity_decode($h_shipping);
 	$order = html_entity_decode($h_order);
 	$group = html_entity_decode($h_group);
@@ -18,6 +20,7 @@
 	$req_mins = (int)$d_ship['AMins'];
 	$req_days = (int)$d_ship['ADays'];
 
+	//decode all jsons
 	$d_order = json_decode($order, TRUE);
 	$d_group = json_decode($group, TRUE);
 	$grouping = array("key");
@@ -26,6 +29,7 @@
 	$_SESSION["avg_days"] = (int)(($_SESSION["avg_days"] + $req_days)/2);
 	$_SESSION["avg_minutes"] = (int)(($_SESSION["avg_minutes"] + $req_mins)/2);
 
+	//loop through each and explicitly state whether grouped or ungrouped
 	foreach ($d_group as &$value) {
 		if ($value != "1") {
 			$value = "0";
@@ -35,6 +39,8 @@
 			array_push($grouping, "Grouped");
 		}
 	}
+
+	// a bit class to encapsulate the whole order
 	class Total_order {
 		public $r_quantity;
 		public $r_grouped;
@@ -55,7 +61,7 @@
 		public $ship_string;
 	}
 
-
+	// fill up a new instance of the class with the variables
 	$obj1 = new Total_order();
 	$obj1->r_quantity = $d_order["Rabbits"];
 	$obj1->r_grouped = $grouping[1];
@@ -73,8 +79,8 @@
 	$obj1->e_grouped = $grouping[4];
 	$obj1->e_location = 'LITTLEstuff';
 
-
+	// add shipping information
 	$obj1->ship_string="Average delivery time: ". $_SESSION["avg_days"] ." days and ". $_SESSION["avg_minutes"] ."  minutes";
-	
+	// print the object as json encoded
 	print json_encode($obj1);
 ?>
